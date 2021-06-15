@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useToasts } from 'react-toast-notifications'
 import { v4 as uuidv4 } from 'uuid'
@@ -44,33 +44,25 @@ import vest from '../../images/icons/vest.png'
 function Main() {
   const quantitiesPerPiece = Array.from(Array(11).keys())
   const clotheSizes = ['', 'PP', 'P', 'M', 'G', 'GG', 'XG', '2XG', '3XG', '4XG']
+  const orderItemEmptyTemplate = {
+    tshirt: { size: '', qty: 0 },
+    tshirtLong: { size: '', qty: 0 },
+    shorts: { size: '', qty: 0 },
+    pants: { size: '', qty: 0 },
+    tanktop: { size: '', qty: 0 },
+    vest: { size: '', qty: 0 },
+  };
 
   const { addToast } = useToasts()
+  let inputName = createRef();
+  let inputNumber = createRef();
+
   const [name, setName] = useState('')
   const [number, setNumber] = useState('')
   const [openedPopup, setOpenedPopup] = useState(false)
-  const [tempOrderItemConfig, setTempOrderItemConfig] = useState({
-    tshirt: { size: 'P', qty: 1 },
-    tshirtLong: { size: 'M', qty: 2 },
-    shorts: { size: 'G', qty: 3 },
-    pants: { size: 'GG', qty: 4 },
-    tanktop: { size: '2XG', qty: 5 },
-    vest: { size: '3XG', qty: 6 },
-  })
+  const [tempOrderItemConfig, setTempOrderItemConfig] = useState({...orderItemEmptyTemplate})
 
-  const [orderListItems, setOrderListItems] = useState([
-    {
-      id: uuidv4(),
-      name: 'Fellp Santos',
-      number: '404',
-      tshirt: { size: 'PP', qty: 1 },
-      tshirtLong: { size: 'P', qty: 2 },
-      shorts: { size: 'M', qty: 3 },
-      pants: { size: 'G', qty: 4 },
-      tanktop: { size: 'GG', qty: 5 },
-      vest: { size: 'XG', qty: 6 },
-    },
-  ])
+  const [orderListItems, setOrderListItems] = useState([]);
 
   useEffect(() => {
     // initial settup
@@ -80,8 +72,20 @@ function Main() {
   const validateAndOpenPopup = () => {
     // Validation
     if (name === '' || number === '') {
-      alert('Please, fill Name and Number before continue.')
-      return
+      addToast('Please fill Name and Number to proceede to order settings.', {
+        appearance: 'error',
+        autoDismiss: true
+      })
+
+      if (name === '') {
+        inputName.focus();
+        return;
+      }
+
+      if (number === '') {
+        inputNumber.focus();
+        return;
+      }
     }
 
     // Open the popup
@@ -102,20 +106,22 @@ function Main() {
       ...orderListItems,
       {
         id: uuidv4(),
-        name: 'Bianca Santos',
-        number: '500',
-        tshirt: { size: 'PP', qty: 1 },
-        tshirtLong: { size: 'P', qty: 2 },
-        shorts: { size: 'M', qty: 3 },
-        pants: { size: 'G', qty: 4 },
-        tanktop: { size: 'GG', qty: 5 },
-        vest: { size: 'XG', qty: 6 },
+        name,
+        number,
+        ...tempOrderItemConfig
       },
     ])
 
-    setOpenedPopup(false)
+    // Clear the inputs
+    setName('');
+    setNumber('');
+    setTempOrderItemConfig({...orderItemEmptyTemplate});
 
-    addToast ('Hello World', {
+    // close popup
+    setOpenedPopup(false);
+
+    // show toast
+    addToast ('The order was added to your list.', {
         appearance: 'success',
         autoDismiss: true,
     })
@@ -158,7 +164,7 @@ function Main() {
                       }
                     >
                       {clotheSizes.map((item) => (
-                        <option value={item}>{item}</option>
+                        <option value={item} key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -176,7 +182,7 @@ function Main() {
                       }
                     >
                       {quantitiesPerPiece.map((item) => (
-                        <option>{item}</option>
+                        <option key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -193,7 +199,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          tshirtLong: {
                             ...tempOrderItemConfig.tshirtLong,
                             size: e.target.value,
                           },
@@ -201,7 +207,7 @@ function Main() {
                       }
                     >
                       {clotheSizes.map((item) => (
-                        <option value={item}>{item}</option>
+                        <option value={item} key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -211,7 +217,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          tshirtLong: {
                             ...tempOrderItemConfig.tshirtLong,
                             qty: e.target.value,
                           },
@@ -219,7 +225,7 @@ function Main() {
                       }
                     >
                       {quantitiesPerPiece.map((item) => (
-                        <option>{item}</option>
+                        <option key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -236,7 +242,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          shorts: {
                             ...tempOrderItemConfig.shorts,
                             size: e.target.value,
                           },
@@ -244,7 +250,7 @@ function Main() {
                       }
                     >
                       {clotheSizes.map((item) => (
-                        <option value={item}>{item}</option>
+                        <option value={item} key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -254,7 +260,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          shorts: {
                             ...tempOrderItemConfig.shorts,
                             qty: e.target.value,
                           },
@@ -262,7 +268,7 @@ function Main() {
                       }
                     >
                       {quantitiesPerPiece.map((item) => (
-                        <option>{item}</option>
+                        <option key={item} value={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -280,7 +286,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          pants: {
                             ...tempOrderItemConfig.pants,
                             size: e.target.value,
                           },
@@ -298,7 +304,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          pants: {
                             ...tempOrderItemConfig.pants,
                             qty: e.target.value,
                           },
@@ -306,7 +312,7 @@ function Main() {
                       }
                     >
                       {quantitiesPerPiece.map((item) => (
-                        <option>{item}</option>
+                        <option key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -323,7 +329,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          tanktop: {
                             ...tempOrderItemConfig.tanktop,
                             size: e.target.value,
                           },
@@ -341,7 +347,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          tanktop: {
                             ...tempOrderItemConfig.tanktop,
                             qty: e.target.value,
                           },
@@ -349,7 +355,7 @@ function Main() {
                       }
                     >
                       {quantitiesPerPiece.map((item) => (
-                        <option>{item}</option>
+                        <option key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -366,7 +372,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          vest: {
                             ...tempOrderItemConfig.vest,
                             size: e.target.value,
                           },
@@ -384,7 +390,7 @@ function Main() {
                       onChange={(e) =>
                         setTempOrderItemConfig({
                           ...tempOrderItemConfig,
-                          tshirt: {
+                          vest: {
                             ...tempOrderItemConfig.vest,
                             qty: e.target.value,
                           },
@@ -392,7 +398,7 @@ function Main() {
                       }
                     >
                       {quantitiesPerPiece.map((item) => (
-                        <option>{item}</option>
+                        <option key={item}>{item}</option>
                       ))}
                     </CustomSelect>
                   </td>
@@ -425,6 +431,7 @@ function Main() {
             <TextInputLabel htmlFor="name">Name</TextInputLabel>
             <TextInput
               id="name"
+              ref={input => inputName = input}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -435,6 +442,7 @@ function Main() {
             <TextInput
               centered
               id="number"
+              ref={input => inputNumber = input}
               value={number}
               onChange={(e) => setNumber(e.target.value)}
             />
@@ -494,27 +502,51 @@ function Main() {
           </tr>
         </TableHeadOrderList>
         <TableBodyOrderList>
+
+          {/* Empty list message */}
+          {orderListItems.length === 0 && (
+            <tr><td colSpan={9} align="center">No orders yet.</td></tr>
+          )}
+
           {orderListItems.map((item) => (
-            <tr>
+            <tr key={item.name}>
               <td width={180}>{item.name}</td>
               <td>{item.number}</td>
               <td>
-                {item.tshirt.qty}-{item.tshirt.size}
+                {(item.tshirt.qty > 0 && item.tshirt.size != '')
+                  ? item.tshirt.qty + '-' + item.tshirt.size
+                  : "-"
+                }
               </td>
               <td>
-                {item.tshirtLong.qty}-{item.tshirtLong.size}
+              {(item.tshirtLong.qty > 0 && item.tshirtLong.size != '')
+                  ? item.tshirtLong.qty + '-' + item.tshirtLong.size
+                  : "-"
+                }
               </td>
               <td>
-                {item.shorts.qty}-{item.shorts.size}
+              {(item.shorts.qty > 0 && item.shorts.size != '')
+                  ? item.shorts.qty + '-' + item.shorts.size
+                  : "-"
+                }
               </td>
               <td>
-                {item.pants.qty}-{item.pants.size}
+              {(item.pants.qty > 0 && item.pants.size != '')
+                  ? item.pants.qty + '-' + item.pants.size
+                  : "-"
+                }
               </td>
               <td>
-                {item.tanktop.qty}-{item.tanktop.size}
+              {(item.tanktop.qty > 0 && item.tanktop.size != '')
+                  ? item.tanktop.qty + '-' + item.tanktop.size
+                  : "-"
+                }
               </td>
               <td>
-                {item.vest.qty}-{item.vest.size}
+              {(item.vest.qty > 0 && item.vest.size != '')
+                  ? item.vest.qty + '-' + item.vest.size
+                  : "-"
+                }
               </td>
               <td>
                 <a href="#!">{<FontAwesomeIcon icon={faTrash} />}</a>

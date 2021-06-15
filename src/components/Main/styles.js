@@ -10,7 +10,7 @@ const Colors = {
 export const MainContainer = styled.div`
     width: 650px;
     margin: 0 auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
     display: flex;
     flex-direction: column;
 `;
@@ -39,7 +39,7 @@ export const TextInputLabel = styled.label`
 `;
 
 export const TextInput = styled.input`
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
     font-size: 18px;
     text-align: ${props => props.centered ? "center" : "left"};
     border-radius: 5px;
@@ -109,8 +109,7 @@ export const ActionDivider = styled.div`
 
 // table
 export const TableOrderList = styled.table`
-    margin: 0px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0px;    
     margin: 0 auto;
     margin-top: 50px;
     width: 650px;
@@ -176,7 +175,6 @@ export const PopupContainer = styled.div`
     margin: 0 auto;
     margin-top: 155px;
     border-radius: 4px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 `;
 
 export const PopupForm = styled.form`
@@ -193,7 +191,6 @@ export const CustomSelect = styled.select`
 `;
 
 export const OrderItemTable = styled.table`
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 20px 0px;
 `;
 
