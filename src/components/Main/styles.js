@@ -114,17 +114,19 @@ export const TableOrderList = styled.table`
     margin: 0 auto;
     margin-top: 50px;
     width: 650px;
+    border-collapse: collapse;
+    border-spacing: 0;
 `;
 
 export const TableHeadOrderList = styled.thead`
     > tr {
         text-align: center;
         
-        
         td {
-            background-color: ${Colors.DarkBlue.Idle};
-            color: #fff;
+            border: 1px solid ${Colors.DarkBlue.Idle};
             padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
         }
     }
 `;
@@ -133,6 +135,20 @@ export const TableBodyOrderList = styled.tbody`
     > tr {
         td:not(:first-child) {
             text-align: center;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 3px;
+        }
+
+        td > a {
+            color: ${Colors.DarkBlue.Idle};
+            transition: color .3s ease;
+
+            :hover {
+                color: ${Colors.DarkBlue.Hover};
+            }
         }
 
         :hover {
@@ -144,7 +160,7 @@ export const TableBodyOrderList = styled.tbody`
 
 // POPUP SECTION
 export const PopupOverlay = styled.div`
-    display: none;
+    display: ${props => props.visible ? "block" : "none"};
     position: absolute;
     top: 0;
     left: 0;
