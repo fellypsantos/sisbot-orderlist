@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useRef, useState } from 'react'
+import React, { createRef, useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useToasts } from 'react-toast-notifications'
 import { v4 as uuidv4 } from 'uuid'
@@ -54,9 +54,6 @@ function Main() {
   };
 
   const { addToast } = useToasts()
-  let inputName = createRef();
-  let inputNumber = createRef();
-
   const [name, setName] = useState('')
   const [number, setNumber] = useState('')
   const [openedPopup, setOpenedPopup] = useState(false)
@@ -69,28 +66,7 @@ function Main() {
     // will run once
   }, [])
 
-  const validateAndOpenPopup = () => {
-    // Validation
-    if (name === '' || number === '') {
-      addToast('Please fill Name and Number to proceede to order settings.', {
-        appearance: 'error',
-        autoDismiss: true
-      })
-
-      if (name === '') {
-        inputName.focus();
-        return;
-      }
-
-      if (number === '') {
-        inputNumber.focus();
-        return;
-      }
-    }
-
-    // Open the popup
-    setOpenedPopup(true)
-  }
+  const validateAndOpenPopup = () => setOpenedPopup(true);
 
   const handlePopupClose = (e) => {
     e.preventDefault()
@@ -101,30 +77,45 @@ function Main() {
     e.preventDefault()
 
     // validate
+    let isEmptyOrder = true;
 
-    setOrderListItems([
-      ...orderListItems,
-      {
-        id: uuidv4(),
-        name,
-        number,
-        ...tempOrderItemConfig
-      },
-    ])
+    console.log('-> ', Object.entries(tempOrderItemConfig));
 
-    // Clear the inputs
-    setName('');
-    setNumber('');
-    setTempOrderItemConfig({...orderItemEmptyTemplate});
+    Object.entries(tempOrderItemConfig).map(item => console.log(item));
 
-    // close popup
-    setOpenedPopup(false);
+    return;
 
-    // show toast
-    addToast ('The order was added to your list.', {
-        appearance: 'success',
-        autoDismiss: true,
-    })
+    if (!isEmptyOrder){
+      console.log('List has items! Saving...');
+
+      setOrderListItems([
+        ...orderListItems,
+        {
+          id: uuidv4(),
+          name,
+          number,
+          ...tempOrderItemConfig
+        },
+      ])
+  
+      // Clear the inputs
+      setName('');
+      setNumber('');
+      setTempOrderItemConfig({...orderItemEmptyTemplate});
+  
+      // close popup
+      setOpenedPopup(false);
+  
+      // show toast
+      addToast ('The order was added to your list.', {
+          appearance: 'success',
+          autoDismiss: true,
+      })
+    }
+
+    else {
+      console.log('List has no items!');
+    }
   }
 
   return (
@@ -431,7 +422,6 @@ function Main() {
             <TextInputLabel htmlFor="name">Name</TextInputLabel>
             <TextInput
               id="name"
-              ref={input => inputName = input}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -442,7 +432,6 @@ function Main() {
             <TextInput
               centered
               id="number"
-              ref={input => inputNumber = input}
               value={number}
               onChange={(e) => setNumber(e.target.value)}
             />
@@ -513,37 +502,37 @@ function Main() {
               <td width={180}>{item.name}</td>
               <td>{item.number}</td>
               <td>
-                {(item.tshirt.qty > 0 && item.tshirt.size != '')
+                {(item.tshirt.qty > 0 && item.tshirt.size !== '')
                   ? item.tshirt.qty + '-' + item.tshirt.size
                   : "-"
                 }
               </td>
               <td>
-              {(item.tshirtLong.qty > 0 && item.tshirtLong.size != '')
+              {(item.tshirtLong.qty > 0 && item.tshirtLong.size !== '')
                   ? item.tshirtLong.qty + '-' + item.tshirtLong.size
                   : "-"
                 }
               </td>
               <td>
-              {(item.shorts.qty > 0 && item.shorts.size != '')
+              {(item.shorts.qty > 0 && item.shorts.size !== '')
                   ? item.shorts.qty + '-' + item.shorts.size
                   : "-"
                 }
               </td>
               <td>
-              {(item.pants.qty > 0 && item.pants.size != '')
+              {(item.pants.qty > 0 && item.pants.size !== '')
                   ? item.pants.qty + '-' + item.pants.size
                   : "-"
                 }
               </td>
               <td>
-              {(item.tanktop.qty > 0 && item.tanktop.size != '')
+              {(item.tanktop.qty > 0 && item.tanktop.size !== '')
                   ? item.tanktop.qty + '-' + item.tanktop.size
                   : "-"
                 }
               </td>
               <td>
-              {(item.vest.qty > 0 && item.vest.size != '')
+              {(item.vest.qty > 0 && item.vest.size !== '')
                   ? item.vest.qty + '-' + item.vest.size
                   : "-"
                 }
