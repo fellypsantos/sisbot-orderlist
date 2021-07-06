@@ -1,0 +1,21 @@
+{
+    "NAME": "Nombre",
+    "NUMBER": "Número",
+    "ORDER": "Pedido",
+    "IMPORT": "Importar",
+    "DOWNLOAD": "Descargar",
+    "EDIT": "Editar",
+    "DELETE": "Borrar",
+    "CLOTHE": "Ropa",
+    "SIZE": "Tamaño",
+    "QUANTITY": "Cantidad",
+    "CANCEL": "Cancelar",
+    "CONFIRM": "Confirmar",
+    "NO_ORDERS": "Aún no hay elementos.",
+    "CONFIGURE_ORDER": "Configurar el Pedido",
+    "CONFIRM_REMOVE_ITEM_FROM_LIST": "¿Quieres eliminar este elemento de la lista?",
+    "TOAST_EMPTY_LIST_ON_UPDATE": "Lista vacía, si ya no la necesita, elimínela.",
+    "TOAST_EMPTY_LIST_ON_ADD": "Lista vacía, nada que añadir al pedido.",
+    "TOAST_ITEM_ADDED": "Se agregó el artículo a su pedido.",
+    "TOAST_ITEM_UPDATED": "¡Hecho! El artículo se actualizó en su lista."
+}

@@ -1,0 +1,21 @@
+{
+    "NAME": "Name",
+    "NUMBER": "Number",
+    "ORDER": "Order",
+    "IMPORT": "Import",
+    "DOWNLOAD": "Download",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "CLOTHE": "Clothing",
+    "SIZE": "Size",
+    "QUANTITY": "Quantity",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "NO_ORDERS": "No items yet.",
+    "CONFIGURE_ORDER": "Configure the Order",
+    "CONFIRM_REMOVE_ITEM_FROM_LIST": "Do you wanna remove this item from list?",
+    "TOAST_EMPTY_LIST_ON_UPDATE": "Empty list, if don't need it anymore, delete it.",
+    "TOAST_EMPTY_LIST_ON_ADD": "Empty list, nothing to add to order.",
+    "TOAST_ITEM_ADDED": "Item was added to your order.",
+    "TOAST_ITEM_UPDATED": "Done! Item was updated in your list."
+}
