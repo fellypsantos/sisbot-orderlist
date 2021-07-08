@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {useToasts} from 'react-toast-notifications';
 import {v4 as uuidv4} from 'uuid';
@@ -41,6 +41,7 @@ import {
 
 // Clothing Icons
 import ClothingIcons from '../../clothinIcons';
+import Utils from '../../Utils';
 
 // Custom Components
 import CustomButton from '../CustomButton';
@@ -124,6 +125,19 @@ function Main() {
   );
 
   const {t} = useTranslation();
+
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        console.log('Popup closed by ESC key.');
+        setOpenedPopup(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   const handlePopupClose = (e) => {
     e.preventDefault();
@@ -280,6 +294,25 @@ function Main() {
     setPopupGlobalItemsConfig(updatedGlobalItemsConfig);
   };
 
+  // HANDLE CLOSE POPUP
+  const closePopupOnClickOverlay = (id) => {
+    if (id === 'popup-overlay') setOpenedPopup(false);
+  };
+
+  // DOWNLOAD ORDER LIST FILE AS CSV
+  const handleDownloadCSVFile = () => {
+    console.log('prepare and download');
+    // let csvContent = '';
+    // Utils.DownloadTextFile('file.csv', 'the csv content here');
+    // if (orderListItems.length === 0) return;
+
+    // orderListItems.map((orderItem) => {
+    //   console.log(orderItem);
+    //   csvContent += `${}`;
+    //   return orderItem;
+    // });
+  };
+
   const popupData = {
     thead: [
       {key: 1, text: t('CLOTHE'), fixedWidth: '60'},
@@ -300,7 +333,11 @@ function Main() {
   return (
     <>
       {/* POPUP SECTION */}
-      <PopupOverlay visible={openedPopup}>
+      <PopupOverlay
+        id="popup-overlay"
+        visible={openedPopup}
+        onKeyPress={(e) => closePopupOnPressESC(e.key)}
+        onClick={(e) => closePopupOnClickOverlay(e.target.id)}>
         <PopupContainer>
           <PopupForm>
             <h3>{t('CONFIGURE_ORDER')}</h3>
@@ -401,7 +438,7 @@ function Main() {
           <ActionDivider />
 
           {/* Download Button */}
-          <ActionButton href="#!">
+          <ActionButton href="#!" onClick={handleDownloadCSVFile}>
             <ActionButtonText marginLeft>{t('DOWNLOAD')}</ActionButtonText>
             <FontAwesomeIcon icon={faDownload} />
           </ActionButton>
