@@ -35,9 +35,8 @@ import {
   PopupForm,
   PopupButtonsContainer,
   NameNumberEditingMode,
-  LanguageContiner,
-  LanguageList,
-  ButtonShowLanguages,
+  LanguageBox,
+  FormBox,
 } from './styles';
 
 // Clothing Icons
@@ -47,6 +46,7 @@ import ClothingIcons from '../../clothinIcons';
 import CustomButton from '../CustomButton';
 import CustomInput from '../CustomInput';
 import PopupClothingConfig from '../PopupClothingConfig';
+import ButtonChangeLanguage from '../ButtonChangeLanguage';
 
 i18n
   .use(initReactI18next)
@@ -117,7 +117,6 @@ function Main() {
   const [number, setNumber] = useState('');
   const [openedPopup, setOpenedPopup] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [languageListVisible, setLanguageListVisible] = useState(false);
   const [itemIdToUpdate, setItemIdToUpdate] = useState(null);
   const [orderListItems, setOrderListItems] = useState([]);
   const [getPopupGlobalItemsConfig, setPopupGlobalItemsConfig] = useState(
@@ -256,23 +255,7 @@ function Main() {
 
   const updateLanguage = (countryCode) => {
     i18n.changeLanguage(countryCode);
-    setLanguageListVisible(false);
   };
-
-  const languages = [
-    {
-      title: 'Português',
-      country_code: 'br',
-    },
-    {
-      title: 'English',
-      country_code: 'us',
-    },
-    {
-      title: 'Spañol',
-      country_code: 'es',
-    },
-  ];
 
   // UPDATE INFORMATIONS IN POPUP WINDOW
   const handleChangePopupInformations = (
@@ -372,59 +355,45 @@ function Main() {
 
       {/* MAIN SECTION */}
       <MainContainer>
-        <LanguageContiner>
-          <ButtonShowLanguages
-            onClick={() => setLanguageListVisible(!languageListVisible)}>
-            <FontAwesomeIcon icon={faLanguage} />
-          </ButtonShowLanguages>
-          {languageListVisible && (
-            <LanguageList>
-              {languages.map((lang) => (
-                <li key={lang.country_code}>
-                  <a
-                    href="#!"
-                    onClick={() => updateLanguage(lang.country_code)}>
-                    <span
-                      className={`flag-icon flag-icon-${lang.country_code}`}
-                    />
-                    {lang.title}
-                  </a>
-                </li>
-              ))}
-            </LanguageList>
-          )}
-        </LanguageContiner>
-
         <FormContainer>
-          <CustomInput
-            id="name"
-            value={name}
-            label={t('NAME')}
-            handleChange={(e) => setName(e.target.value)}
-          />
+          <LanguageBox>
+            <ButtonChangeLanguage
+              icon={faLanguage}
+              handleChange={updateLanguage}
+            />
+          </LanguageBox>
 
-          <CustomInput
-            small
-            centered
-            id="number"
-            value={number}
-            label={t('NUMBER')}
-            handleChange={(e) => setNumber(e.target.value)}
-          />
+          <FormBox>
+            <CustomInput
+              id="name"
+              value={name}
+              label={t('NAME')}
+              handleChange={(e) => setName(e.target.value)}
+            />
 
-          <CustomButton
-            text={t('ORDER')}
-            icon={faPlus}
-            handleClick={(e) => {
-              setOpenedPopup(true);
-              e.preventDefault();
-            }}
-          />
+            <CustomInput
+              small
+              centered
+              id="number"
+              value={number}
+              label={t('NUMBER')}
+              handleChange={(e) => setNumber(e.target.value)}
+            />
+
+            <CustomButton
+              text={t('ORDER')}
+              icon={faPlus}
+              handleClick={(e) => {
+                setOpenedPopup(true);
+                e.preventDefault();
+              }}
+            />
+          </FormBox>
         </FormContainer>
 
         <ImportExportContainer>
           {/* Import Button */}
-          <ActionButton href="">
+          <ActionButton href="#!">
             <FontAwesomeIcon icon={faUpload} />
             <ActionButtonText marginRight>{t('IMPORT')}</ActionButtonText>
           </ActionButton>
@@ -432,7 +401,7 @@ function Main() {
           <ActionDivider />
 
           {/* Download Button */}
-          <ActionButton href="">
+          <ActionButton href="#!">
             <ActionButtonText marginLeft>{t('DOWNLOAD')}</ActionButtonText>
             <FontAwesomeIcon icon={faDownload} />
           </ActionButton>
