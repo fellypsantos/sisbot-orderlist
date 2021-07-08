@@ -1,9 +1,8 @@
-import React, { createRef, useEffect, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useToasts } from 'react-toast-notifications'
-import { v4 as uuidv4 } from 'uuid'
-
-import 'flag-icon-css/css/flag-icon.min.css'
+import React, {useState} from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {useToasts} from 'react-toast-notifications';
+import {v4 as uuidv4} from 'uuid';
+import 'flag-icon-css/css/flag-icon.min.css';
 
 import {
   faUpload,
@@ -13,150 +12,158 @@ import {
   faPen,
   faSave,
   faLanguage,
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/free-solid-svg-icons';
+
+// Multilanguage implementation
+import i18n from 'i18next';
+import {useTranslation, initReactI18next} from 'react-i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import HttpApi from 'i18next-http-backend';
 
 import {
   MainContainer,
   FormContainer,
-  TextInputContainer,
-  TextInputLabel,
-  TextInput,
   ImportExportContainer,
   ActionButton,
   ActionButtonText,
   ActionDivider,
-  ButtonAddOrder,
-  ButtonAddOrderText,
   TableOrderList,
   TableHeadOrderList,
   TableBodyOrderList,
   PopupOverlay,
   PopupContainer,
   PopupForm,
-  CustomSelect,
-  OrderItemTable,
   PopupButtonsContainer,
   NameNumberEditingMode,
   LanguageContiner,
   LanguageList,
   ButtonShowLanguages,
-} from './styles'
+} from './styles';
 
-import tshirt from '../../images/icons/tshirt.png'
-import tshirtLong from '../../images/icons/tshirt-long.png'
-import shorts from '../../images/icons/shorts.png'
-import pants from '../../images/icons/pants.png'
-import tanktop from '../../images/icons/tanktop.png'
-import vest from '../../images/icons/vest.png'
+// Clothing Icons
+import ClothingIcons from '../../clothinIcons';
 
-import i18n from "i18next";
-import { useTranslation, initReactI18next } from "react-i18next";
-import LanguageDetector from 'i18next-browser-languagedetector';
-import HttpApi from 'i18next-http-backend';
-import i18next from 'i18next'
-
+// Custom Components
+import CustomButton from '../CustomButton';
+import CustomInput from '../CustomInput';
+import PopupClothingConfig from '../PopupClothingConfig';
 
 i18n
   .use(initReactI18next)
   .use(LanguageDetector)
   .use(HttpApi)
   .init({
-    fallbackLng: "en",
+    fallbackLng: 'en',
     detection: {
       order: ['cookie', 'localStorage', 'htmlTag', 'path'],
-      caches: ['cookie']
+      caches: ['cookie'],
     },
     backend: {
       loadPath: '/assets/locales/{{lng}}/translation.json',
     },
-    react: { useSuspense: false }
+    react: {useSuspense: false},
   });
 
-
 function Main() {
-  const quantitiesPerPiece = Array.from(Array(11).keys())
-  const clotheSizes = ['', 'PP', 'P', 'M', 'G', 'GG', 'XG', '2XG', '3XG', '4XG']
-  const orderItemEmptyTemplate = {
-    tshirt: { size: '', qty: 0 },
-    tshirtLong: { size: '', qty: 0 },
-    shorts: { size: '', qty: 0 },
-    pants: { size: '', qty: 0 },
-    tanktop: { size: '', qty: 0 },
-    vest: { size: '', qty: 0 },
-  }
+  const popupGlobalItemsConfigEmptySample = [
+    {
+      id: '1',
+      name: 'tshirt',
+      size: '',
+      quantity: 0,
+      icon: ClothingIcons.tshirt,
+    },
+    {
+      id: '2',
+      name: 'tshirtLong',
+      size: '',
+      quantity: 0,
+      icon: ClothingIcons.tshirtLong,
+    },
+    {
+      id: '3',
+      name: 'shorts',
+      size: '',
+      quantity: 0,
+      icon: ClothingIcons.shorts,
+    },
+    {
+      id: '4',
+      name: 'pants',
+      size: '',
+      quantity: 0,
+      icon: ClothingIcons.pants,
+    },
+    {
+      id: '5',
+      name: 'tanktop',
+      size: '',
+      quantity: 0,
+      icon: ClothingIcons.tanktop,
+    },
+    {
+      id: '6',
+      name: 'vest',
+      size: '',
+      quantity: 0,
+      icon: ClothingIcons.vest,
+    },
+  ];
 
-  const { addToast } = useToasts()
-  const [name, setName] = useState('')
-  const [number, setNumber] = useState('')
-  const [openedPopup, setOpenedPopup] = useState(false)
-  const [editMode, setEditMode] = useState(false)
+  const popupGlobalItemsConfig = popupGlobalItemsConfigEmptySample;
+
+  const {addToast} = useToasts();
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const [openedPopup, setOpenedPopup] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const [languageListVisible, setLanguageListVisible] = useState(false);
-  const [itemIdToUpdate, setItemIdToUpdate] = useState(null)
-  const [tempOrderItemConfig, setTempOrderItemConfig] = useState({
-    ...orderItemEmptyTemplate,
-  })
+  const [itemIdToUpdate, setItemIdToUpdate] = useState(null);
+  const [orderListItems, setOrderListItems] = useState([]);
+  const [getPopupGlobalItemsConfig, setPopupGlobalItemsConfig] = useState(
+    popupGlobalItemsConfig,
+  );
 
-  const [orderListItems, setOrderListItems] = useState([])
   const {t} = useTranslation();
 
-  useEffect(() => {
-    // initial settup
-    // will run once    
-  }, [])
-
-  const validateAndOpenPopup = () => setOpenedPopup(true)
+  const validateAndOpenPopup = () => setOpenedPopup(true);
 
   const handlePopupClose = (e) => {
-    e.preventDefault()
-    setOpenedPopup(false)
-    setEditMode(false)
+    e.preventDefault();
+    setOpenedPopup(false);
+    setEditMode(false);
     setItemIdToUpdate(null);
     setName('');
     setNumber('');
-    setTempOrderItemConfig(orderItemEmptyTemplate);
-  }
+    setPopupGlobalItemsConfig(popupGlobalItemsConfigEmptySample);
+  };
 
+  // CHEFK IF IS EMPTY
   const isPopupItemsEmpty = () => {
-    let totalPiecesInOrder = 0
-    const {tshirt, tshirtLong, tanktop, shorts, pants} = tempOrderItemConfig;
-    const clothesOnly = {
-      tshirt,
-      tshirtLong,
-      tanktop,
-      shorts,
-      pants
-    };
+    let totalPiecesInOrder = 0;
 
-    Object.entries(clothesOnly).map((item) => {
-      // sum all pieces to check if is empty order
-      const { qty } = item[1]
-      totalPiecesInOrder += parseInt(qty)
-    })
+    getPopupGlobalItemsConfig.map((item) => {
+      totalPiecesInOrder += parseInt(item.quantity);
+      return item;
+    });
 
-    return totalPiecesInOrder == 0
-  }
+    return totalPiecesInOrder === 0;
+  };
 
   const handleUpdateItem = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // validate
-    const isEmptyList = isPopupItemsEmpty()
+    const isEmptyList = isPopupItemsEmpty();
 
     if (isEmptyList) {
       // show toast
       addToast(t('TOAST_EMPTY_LIST_ON_UPDATE'), {
         appearance: 'warning',
         autoDismiss: true,
-      })
+      });
 
-      return
-    }
-
-    // continue process to update
-    const updatedItemInformations = {
-      ...tempOrderItemConfig,
-      name,
-      number,
+      return;
     }
 
     const newUpdatedList = orderListItems.map((item) => {
@@ -164,43 +171,51 @@ function Main() {
         // item found
         return {
           id: item.id,
-          ...updatedItemInformations,
-        }
+          name,
+          number,
+          clothingConfig: [...getPopupGlobalItemsConfig],
+        };
       }
 
       return item;
-    })
+    });
 
-    setEditMode(false)
-    setName('')
-    setNumber('')
-    setItemIdToUpdate(null)
-    setOrderListItems(newUpdatedList)
-    setOpenedPopup(false)
+    setEditMode(false);
+    setName('');
+    setNumber('');
+    setItemIdToUpdate(null);
+    setOrderListItems(newUpdatedList);
+    setOpenedPopup(false);
 
     addToast(t('TOAST_ITEM_UPDATED'), {
       appearance: 'success',
       autoDismiss: true,
-    })
-  }
+    });
+  };
+
+  const clearForm = () => {
+    setName('');
+    setNumber('');
+    setPopupGlobalItemsConfig(popupGlobalItemsConfigEmptySample);
+  };
 
   const handleAddOrderItem = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // validate
-    const isEmptyList = isPopupItemsEmpty()
+    const isEmptyList = isPopupItemsEmpty();
 
     if (isEmptyList) {
       // show toast
       addToast(t('TOAST_EMPTY_LIST_ON_ADD'), {
         appearance: 'warning',
         autoDismiss: true,
-      })
+      });
 
-      return
+      return;
     }
 
-    console.log('List has items! Saving...')
+    console.log('List has items! Saving...');
 
     setOrderListItems([
       ...orderListItems,
@@ -208,65 +223,89 @@ function Main() {
         id: uuidv4(),
         name,
         number,
-        ...tempOrderItemConfig,
+        clothingConfig: getPopupGlobalItemsConfig,
       },
-    ])
+    ]);
 
-    // Clear the inputs
-    setName('')
-    setNumber('')
-    setTempOrderItemConfig({ ...orderItemEmptyTemplate })
+    clearForm(); // Clear the inputs
+    setOpenedPopup(false);
 
-    // close popup
-    setOpenedPopup(false)
-
-    // show toast
     addToast(t('TOAST_ITEM_ADDED'), {
       appearance: 'success',
       autoDismiss: true,
-    })
-  }
+    });
+  };
 
   const editOrderListItem = (itemID) => {
-    console.log('Edit the idem: ', itemID)
-    const theItemToEdit = orderListItems.find((item) => item.id === itemID)
+    const theItemToEdit = orderListItems.find((item) => item.id === itemID);
 
-    setName(theItemToEdit.name)
-    setNumber(theItemToEdit.number)
-    setItemIdToUpdate(itemID)
-    setEditMode(true)
-    setTempOrderItemConfig(theItemToEdit) // this data is read by popup
-    setOpenedPopup(true)
-  }
+    setEditMode(true);
+    setName(theItemToEdit.name);
+    setNumber(theItemToEdit.number);
+    setItemIdToUpdate(itemID);
+    setPopupGlobalItemsConfig(theItemToEdit.clothingConfig); // this data is read by popup
+    setOpenedPopup(true);
+  };
 
   const deleteOrderListItem = (itemID) => {
     const confirmDelete = window.confirm(t('CONFIRM_REMOVE_ITEM_FROM_LIST'));
     if (!confirmDelete) return;
 
-    const updatedList = orderListItems.filter(item => item.id !== itemID);
+    const updatedList = orderListItems.filter((item) => item.id !== itemID);
     setOrderListItems(updatedList);
     console.log('Item removed: ', itemID);
-  }
+  };
 
-  const updateLanguage = countryCode => {
-    i18next.changeLanguage(countryCode);
+  const updateLanguage = (countryCode) => {
+    i18n.changeLanguage(countryCode);
     setLanguageListVisible(false);
-  }
+  };
 
   const languages = [
     {
       title: 'Português',
-      country_code: 'br'
+      country_code: 'br',
     },
     {
       title: 'English',
-      country_code: 'us'
+      country_code: 'us',
     },
     {
       title: 'Spañol',
-      country_code: 'es'
+      country_code: 'es',
     },
   ];
+
+  // UPDATE INFORMATIONS IN POPUP WINDOW
+  const handleChangePopupInformations = (
+    itemParam,
+    selectedSize = null,
+    selectedQuantity = null,
+  ) => {
+    const updatedGlobalItemsConfig = getPopupGlobalItemsConfig.map((item) => {
+      if (item.id === itemParam.id) {
+        return {
+          ...item,
+          size: selectedSize !== null ? selectedSize : item.size,
+          quantity:
+            selectedQuantity !== null ? selectedQuantity : item.quantity,
+        };
+      }
+
+      return item;
+    });
+
+    // update the state
+    setPopupGlobalItemsConfig(updatedGlobalItemsConfig);
+  };
+
+  const popupData = {
+    thead: [
+      {key: '1', text: t('CLOTHE'), fixedWidth: '60'},
+      {key: '2', text: t('SIZE'), fixedWidth: '90'},
+      {key: '3', text: t('QUANTITY')},
+    ],
+  };
 
   return (
     <>
@@ -279,317 +318,30 @@ function Main() {
             {/* Name and Number when editing */}
             {editMode && (
               <NameNumberEditingMode>
-              <TextInputContainer>
-                <TextInputLabel htmlFor="name">{t('NAME')}</TextInputLabel>
-                <TextInput
+                <CustomInput
                   id="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  label={t('NAME')}
+                  handleChange={(e) => setName(e.target.value)}
                 />
-              </TextInputContainer>
 
-              <TextInputContainer small>
-                <TextInputLabel htmlFor="number">{t('NUMBER')}</TextInputLabel>
-                <TextInput
+                <CustomInput
+                  small
                   centered
                   id="number"
                   value={number}
-                  onChange={(e) => setNumber(e.target.value)}
+                  label={t('NUMBER')}
+                  handleChange={(e) => setNumber(e.target.value)}
                 />
-              </TextInputContainer>
-            </NameNumberEditingMode>
+              </NameNumberEditingMode>
             )}
 
-            <OrderItemTable>
-              <thead>
-                <tr>
-                  <td width="60">{t('CLOTHE')}</td>
-                  <td width="90">{t('SIZE')}</td>
-                  <td>{t('QUANTITY')}</td>
-                </tr>
-              </thead>
-
-              <tbody>
-                {/* Short Sleeve */}
-                <tr>
-                  <td>
-                    <img src={tshirt} alt="Clothe Icon" />
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.tshirt.size}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          tshirt: {
-                            ...tempOrderItemConfig.tshirt,
-                            size: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {clotheSizes.map((item) => (
-                        <option value={item} key={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.tshirt.qty}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          tshirt: {
-                            ...tempOrderItemConfig.tshirt,
-                            qty: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {quantitiesPerPiece.map((item) => (
-                        <option key={item}>{item}</option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                </tr>
-
-                {/* Long Sleeve */}
-                <tr>
-                  <td>
-                    <img src={tshirtLong} alt="Clothe Icon" />
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.tshirtLong.size}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          tshirtLong: {
-                            ...tempOrderItemConfig.tshirtLong,
-                            size: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {clotheSizes.map((item) => (
-                        <option value={item} key={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.tshirtLong.qty}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          tshirtLong: {
-                            ...tempOrderItemConfig.tshirtLong,
-                            qty: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {quantitiesPerPiece.map((item) => (
-                        <option key={item}>{item}</option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                </tr>
-
-                {/* Shorts */}
-                <tr>
-                  <td>
-                    <img src={shorts} alt="Clothe Icon" />
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.shorts.size}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          shorts: {
-                            ...tempOrderItemConfig.shorts,
-                            size: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {clotheSizes.map((item) => (
-                        <option value={item} key={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.shorts.qty}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          shorts: {
-                            ...tempOrderItemConfig.shorts,
-                            qty: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {quantitiesPerPiece.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                </tr>
-
-                {/* Pants */}
-                <tr>
-                  <td>
-                    <img src={pants} alt="Clothe Icon" />
-                  </td>
-
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.pants.size}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          pants: {
-                            ...tempOrderItemConfig.pants,
-                            size: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {clotheSizes.map((item) => (
-                        <option value={item} key={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.pants.qty}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          pants: {
-                            ...tempOrderItemConfig.pants,
-                            qty: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {quantitiesPerPiece.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                </tr>
-
-                {/* Clothe */}
-                <tr>
-                  <td>
-                    <img src={tanktop} alt="Clothe Icon" />
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.tanktop.size}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          tanktop: {
-                            ...tempOrderItemConfig.tanktop,
-                            size: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {clotheSizes.map((item) => (
-                        <option value={item} key={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.tanktop.qty}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          tanktop: {
-                            ...tempOrderItemConfig.tanktop,
-                            qty: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {quantitiesPerPiece.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                </tr>
-
-                {/* Clothe */}
-                <tr>
-                  <td>
-                    <img src={vest} alt="Clothe Icon" />
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.vest.size}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          vest: {
-                            ...tempOrderItemConfig.vest,
-                            size: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {clotheSizes.map((item) => (
-                        <option value={item} key={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                  <td>
-                    <CustomSelect
-                      value={tempOrderItemConfig.vest.qty}
-                      onChange={(e) =>
-                        setTempOrderItemConfig({
-                          ...tempOrderItemConfig,
-                          vest: {
-                            ...tempOrderItemConfig.vest,
-                            qty: e.target.value,
-                          },
-                        })
-                      }
-                    >
-                      {quantitiesPerPiece.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </CustomSelect>
-                  </td>
-                </tr>
-              </tbody>
-            </OrderItemTable>
+            <PopupClothingConfig
+              theadData={popupData.thead}
+              tbodyData={getPopupGlobalItemsConfig}
+              tbodyDataOnChange={handleChangePopupInformations}
+              maxQuantityPerPiece={50}
+            />
 
             {/* Buttons Section */}
             <PopupButtonsContainer>
@@ -602,8 +354,7 @@ function Main() {
 
               <ActionButton
                 href=""
-                onClick={editMode ? handleUpdateItem : handleAddOrderItem}
-              >
+                onClick={editMode ? handleUpdateItem : handleAddOrderItem}>
                 <ActionButtonText marginLeft>{t('CONFIRM')}</ActionButtonText>
                 <FontAwesomeIcon icon={faSave} />
               </ActionButton>
@@ -615,55 +366,58 @@ function Main() {
       {/* MAIN SECTION */}
       <MainContainer>
         <LanguageContiner>
-          <ButtonShowLanguages onClick={() => setLanguageListVisible(!languageListVisible)}>
+          <ButtonShowLanguages
+            onClick={() => setLanguageListVisible(!languageListVisible)}>
             <FontAwesomeIcon icon={faLanguage} />
           </ButtonShowLanguages>
           {languageListVisible && (
-            <LanguageList>            
-              { languages.map(lang => (
+            <LanguageList>
+              {languages.map((lang) => (
                 <li key={lang.country_code}>
-                  <a href="#!" onClick={() => updateLanguage(lang.country_code)}>
-                    <span className={`flag-icon flag-icon-${lang.country_code}`}></span>
+                  <a
+                    href="#!"
+                    onClick={() => updateLanguage(lang.country_code)}>
+                    <span
+                      className={`flag-icon flag-icon-${lang.country_code}`}
+                    />
                     {lang.title}
                   </a>
                 </li>
-              )) }
+              ))}
             </LanguageList>
           )}
         </LanguageContiner>
 
-        <FormContainer>          
-          <TextInputContainer>
-            <TextInputLabel htmlFor="name">{t('NAME')}</TextInputLabel>
-            <TextInput
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </TextInputContainer>
+        <FormContainer>
+          <CustomInput
+            id="name"
+            value={name}
+            label={t('NAME')}
+            handleChange={(e) => setName(e.target.value)}
+          />
 
-          <TextInputContainer small>
-            <TextInputLabel htmlFor="number">{t('NUMBER')}</TextInputLabel>
-            <TextInput
-              centered
-              id="number"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-            />
-          </TextInputContainer>
+          <CustomInput
+            small
+            centered
+            id="number"
+            value={number}
+            label={t('NUMBER')}
+            handleChange={(e) => setNumber(e.target.value)}
+          />
 
-          <ButtonAddOrder
-            href="javascript:void(0)"
-            onClick={validateAndOpenPopup}
-          >
-            <FontAwesomeIcon icon={faPlus} />
-            <ButtonAddOrderText>{t('ORDER')}</ButtonAddOrderText>
-          </ButtonAddOrder>
+          <CustomButton
+            text={t('ORDER')}
+            icon={faPlus}
+            handleClick={(e) => {
+              setOpenedPopup(true);
+              e.preventDefault();
+            }}
+          />
         </FormContainer>
 
         <ImportExportContainer>
           {/* Import Button */}
-          <ActionButton href="javascript:void(0)">
+          <ActionButton href="">
             <FontAwesomeIcon icon={faUpload} />
             <ActionButtonText marginRight>{t('IMPORT')}</ActionButtonText>
           </ActionButton>
@@ -671,7 +425,7 @@ function Main() {
           <ActionDivider />
 
           {/* Download Button */}
-          <ActionButton href="javascript:void(0)">
+          <ActionButton href="">
             <ActionButtonText marginLeft>{t('DOWNLOAD')}</ActionButtonText>
             <FontAwesomeIcon icon={faDownload} />
           </ActionButton>
@@ -685,22 +439,22 @@ function Main() {
             <td>{t('NAME')}</td>
             <td>{t('NUMBER')}</td>
             <td>
-              <img src={tshirt} alt="Clothe Icon" />
+              <img src={ClothingIcons.tshirt} alt="Clothe Icon" />
             </td>
             <td>
-              <img src={tshirtLong} alt="Clothe Icon" />
+              <img src={ClothingIcons.tshirtLong} alt="Clothe Icon" />
             </td>
             <td>
-              <img src={shorts} alt="Clothe Icon" />
+              <img src={ClothingIcons.shorts} alt="Clothe Icon" />
             </td>
             <td>
-              <img src={pants} alt="Clothe Icon" />
+              <img src={ClothingIcons.pants} alt="Clothe Icon" />
             </td>
             <td>
-              <img src={tanktop} alt="Clothe Icon" />
+              <img src={ClothingIcons.tanktop} alt="Clothe Icon" />
             </td>
             <td>
-              <img src={vest} alt="Clothe Icon" />
+              <img src={ClothingIcons.vest} alt="Clothe Icon" />
             </td>
             <td>{t('EDIT')}</td>
             <td>{t('DELETE')}</td>
@@ -711,7 +465,7 @@ function Main() {
           {orderListItems.length === 0 && (
             <tr>
               <td colSpan={11} align="center">
-              {t('NO_ORDERS')}
+                {t('NO_ORDERS')}
               </td>
             </tr>
           )}
@@ -720,44 +474,24 @@ function Main() {
             <tr key={item.id}>
               <td width={180}>{item.name}</td>
               <td>{item.number}</td>
-              <td>
-                {item.tshirt.qty > 0 && item.tshirt.size !== ''
-                  ? item.tshirt.qty + '-' + item.tshirt.size
-                  : '-'}
-              </td>
-              <td>
-                {item.tshirtLong.qty > 0 && item.tshirtLong.size !== ''
-                  ? item.tshirtLong.qty + '-' + item.tshirtLong.size
-                  : '-'}
-              </td>
-              <td>
-                {item.shorts.qty > 0 && item.shorts.size !== ''
-                  ? item.shorts.qty + '-' + item.shorts.size
-                  : '-'}
-              </td>
-              <td>
-                {item.pants.qty > 0 && item.pants.size !== ''
-                  ? item.pants.qty + '-' + item.pants.size
-                  : '-'}
-              </td>
-              <td>
-                {item.tanktop.qty > 0 && item.tanktop.size !== ''
-                  ? item.tanktop.qty + '-' + item.tanktop.size
-                  : '-'}
-              </td>
-              <td>
-                {item.vest.qty > 0 && item.vest.size !== ''
-                  ? item.vest.qty + '-' + item.vest.size
-                  : '-'}
-              </td>
+
+              {item.clothingConfig.map((clotheItem) => (
+                <td key={clotheItem.key}>
+                  {clotheItem.quantity > 0 && clotheItem.size !== ''
+                    ? `${clotheItem.quantity}-${clotheItem.size}`
+                    : '-'}
+                </td>
+              ))}
+
               <td>
                 <a href="#!" onClick={() => editOrderListItem(item.id)}>
-                  {<FontAwesomeIcon icon={faPen} />}
+                  <FontAwesomeIcon icon={faPen} />
                 </a>
               </td>
+
               <td>
                 <a href="#!" onClick={() => deleteOrderListItem(item.id)}>
-                  {<FontAwesomeIcon icon={faTrash} />}
+                  <FontAwesomeIcon icon={faTrash} />
                 </a>
               </td>
             </tr>
@@ -765,7 +499,7 @@ function Main() {
         </TableBodyOrderList>
       </TableOrderList>
     </>
-  )
+  );
 }
 
-export default Main
+export default Main;
