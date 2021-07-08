@@ -126,8 +126,6 @@ function Main() {
 
   const {t} = useTranslation();
 
-  const validateAndOpenPopup = () => setOpenedPopup(true);
-
   const handlePopupClose = (e) => {
     e.preventDefault();
     setOpenedPopup(false);
@@ -301,11 +299,20 @@ function Main() {
 
   const popupData = {
     thead: [
-      {key: '1', text: t('CLOTHE'), fixedWidth: '60'},
-      {key: '2', text: t('SIZE'), fixedWidth: '90'},
-      {key: '3', text: t('QUANTITY')},
+      {key: 1, text: t('CLOTHE'), fixedWidth: '60'},
+      {key: 2, text: t('SIZE'), fixedWidth: '90'},
+      {key: 3, text: t('QUANTITY')},
     ],
   };
+
+  const clothingIconsForOrderListTable = [
+    {id: 1, icon: ClothingIcons.tshirt},
+    {id: 2, icon: ClothingIcons.tshirtLong},
+    {id: 3, icon: ClothingIcons.shorts},
+    {id: 4, icon: ClothingIcons.pants},
+    {id: 5, icon: ClothingIcons.tanktop},
+    {id: 6, icon: ClothingIcons.vest},
+  ];
 
   return (
     <>
@@ -438,24 +445,13 @@ function Main() {
           <tr>
             <td>{t('NAME')}</td>
             <td>{t('NUMBER')}</td>
-            <td>
-              <img src={ClothingIcons.tshirt} alt="Clothe Icon" />
-            </td>
-            <td>
-              <img src={ClothingIcons.tshirtLong} alt="Clothe Icon" />
-            </td>
-            <td>
-              <img src={ClothingIcons.shorts} alt="Clothe Icon" />
-            </td>
-            <td>
-              <img src={ClothingIcons.pants} alt="Clothe Icon" />
-            </td>
-            <td>
-              <img src={ClothingIcons.tanktop} alt="Clothe Icon" />
-            </td>
-            <td>
-              <img src={ClothingIcons.vest} alt="Clothe Icon" />
-            </td>
+
+            {clothingIconsForOrderListTable.map((iconItem) => (
+              <td key={iconItem.id}>
+                <img src={iconItem.icon} alt="SISBot CLothing Icon" />
+              </td>
+            ))}
+
             <td>{t('EDIT')}</td>
             <td>{t('DELETE')}</td>
           </tr>
@@ -470,13 +466,14 @@ function Main() {
             </tr>
           )}
 
+          {/* Generate the table rows, showing the order list */}
           {orderListItems.map((item) => (
-            <tr key={item.id}>
+            <tr key={item.id} data-id={item.id}>
               <td width={180}>{item.name}</td>
               <td>{item.number}</td>
 
               {item.clothingConfig.map((clotheItem) => (
-                <td key={clotheItem.key}>
+                <td key={clotheItem.id}>
                   {clotheItem.quantity > 0 && clotheItem.size !== ''
                     ? `${clotheItem.quantity}-${clotheItem.size}`
                     : '-'}
